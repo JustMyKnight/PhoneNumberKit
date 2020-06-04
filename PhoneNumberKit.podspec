@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "PhoneNumberKit"
-  s.version          = "3.2.0"
+  s.version          = "3.2.1"
   s.summary          = "Swift framework for working with phone numbers"
 
 # This description is used to generate tags and improve search results.
@@ -20,11 +20,11 @@ Pod::Spec.new do |s|
                         A Swift framework for parsing, formatting and validating international phone numbers. Inspired by Google's libphonenumber.
                        DESC
 
-  s.homepage         = "https://github.com/marmelroy/PhoneNumberKit"
+  s.homepage         = "https://github.com/JustMyKnight/PhoneNumberKit"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
-  s.author           = { "Roy Marmelstein" => "marmelroy@gmail.com" }
-  s.source           = { :git => "https://github.com/marmelroy/PhoneNumberKit.git", :tag => s.version.to_s }
+  s.author            = { "Pavel Fokin" => "p_fokin@hotmail.com" }
+  s.source           = { :git => "https://github.com/JustMyKnight/PhoneNumberKit.git", :tag => s.version.to_s }
   s.social_media_url   = "http://twitter.com/marmelroy"
 
 

@@ -90,10 +90,10 @@ public class CountryCodePickerViewController: UITableViewController {
         self.title = NSLocalizedString("PhoneNumberKit.CountryCodePicker.Title", value: "Choose your country", comment: "Title of CountryCodePicker ViewController")
 
         tableView.register(Cell.self, forCellReuseIdentifier: Cell.reuseIdentifier)
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.backgroundColor = .clear
-        navigationItem.searchController = searchController
+//        searchController.searchResultsUpdater = self
+//        searchController.obscuresBackgroundDuringPresentation = false
+//        searchController.searchBar.backgroundColor = .clear
+//        navigationItem.searchController = searchController
         definesPresentationContext = true
     }
 

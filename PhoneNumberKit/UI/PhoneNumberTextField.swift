@@ -3,7 +3,7 @@
 //  PhoneNumberKit
 //
 //  Created by Roy Marmelstein on 07/11/2015.
-//  Copyright © 2015 Roy Marmelstein. All rights reserved.
+//  Copyright © 2021 Roy Marmelstein. All rights reserved.
 //
 
 #if canImport(UIKit)
@@ -53,7 +53,9 @@ open class PhoneNumberTextField: UITextField, UITextFieldDelegate {
                 please override defaultRegion in a subclass instead.
             """
         )
-        set {}
+        set {
+            self.partialFormatter.defaultRegion = newValue
+        }
     }
 
     public var withPrefix: Bool = true {
@@ -393,7 +395,7 @@ open class PhoneNumberTextField: UITextField, UITextFieldDelegate {
 
     open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // This allows for the case when a user autocompletes a phone number:
-        if range == NSRange(location: 0, length: 0), string == " " {
+        if range == NSRange(location: 0, length: 0) && string.isBlank {
             return true
         }
 
@@ -462,15 +464,20 @@ open class PhoneNumberTextField: UITextField, UITextFieldDelegate {
     }
 
     open func textFieldDidEndEditing(_ textField: UITextField) {
-        if self.withExamplePlaceholder, self.withPrefix, let countryCode = phoneNumberKit.countryCode(for: currentRegion)?.description,
-            let text = textField.text,
-            text == internationalPrefix(for: countryCode) {
-            textField.text = ""
-            sendActions(for: .editingChanged)
-            self.updateFlag()
-            self.updatePlaceholder()
-        }
+        updateTextFieldDidEndEditing(textField)
         self._delegate?.textFieldDidEndEditing?(textField)
+    }
+
+    @available (iOS 10.0, tvOS 10.0, *)
+    open func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+        updateTextFieldDidEndEditing(textField)
+        if let _delegate = _delegate {
+            if (_delegate.responds(to: #selector(textFieldDidEndEditing(_:reason:)))) {
+                _delegate.textFieldDidEndEditing?(textField, reason: reason)
+            } else {
+                _delegate.textFieldDidEndEditing?(textField)
+            }
+        }
     }
 
     open func textFieldShouldClear(_ textField: UITextField) -> Bool {
@@ -480,12 +487,23 @@ open class PhoneNumberTextField: UITextField, UITextFieldDelegate {
     open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         return self._delegate?.textFieldShouldReturn?(textField) ?? true
     }
+
+    private func updateTextFieldDidEndEditing(_ textField: UITextField) {
+        if self.withExamplePlaceholder, self.withPrefix, let countryCode = phoneNumberKit.countryCode(for: currentRegion)?.description,
+            let text = textField.text,
+            text == internationalPrefix(for: countryCode) {
+            textField.text = ""
+            sendActions(for: .editingChanged)
+            self.updateFlag()
+            self.updatePlaceholder()
+        }
+    }
 }
 
 @available(iOS 11.0, *)
 extension PhoneNumberTextField: CountryCodePickerDelegate {
 
-    func countryCodePickerViewControllerDidPickCountry(_ country: CountryCodePickerViewController.Country) {
+    public func countryCodePickerViewControllerDidPickCountry(_ country: CountryCodePickerViewController.Country) {
         text = isEditing ? "+" + country.prefix : ""
         _defaultRegion = country.code
         partialFormatter.defaultRegion = country.code
@@ -498,6 +516,12 @@ extension PhoneNumberTextField: CountryCodePickerDelegate {
             containingViewController?.dismiss(animated: true)
         }
     }
+}
+
+extension String {
+  var isBlank: Bool {
+    return allSatisfy({ $0.isWhitespace })
+  }
 }
 
 #endif

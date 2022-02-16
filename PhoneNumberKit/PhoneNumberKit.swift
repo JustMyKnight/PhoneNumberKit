@@ -3,7 +3,7 @@
 //  PhoneNumberKit
 //
 //  Created by Roy Marmelstein on 03/10/2015.
-//  Copyright © 2015 Roy Marmelstein. All rights reserved.
+//  Copyright © 2021 Roy Marmelstein. All rights reserved.
 //
 
 import Foundation
@@ -296,7 +296,13 @@ public final class PhoneNumberKit: NSObject {
     public class func defaultRegionCode() -> String {
 #if os(iOS) && !targetEnvironment(simulator) && !targetEnvironment(macCatalyst)
         let networkInfo = CTTelephonyNetworkInfo()
-        let carrier = networkInfo.subscriberCellularProvider
+        var carrier: CTCarrier? = nil
+        if #available(iOS 12.0, *) {
+            carrier = networkInfo.serviceSubscriberCellularProviders?.values.first
+        } else {
+            carrier = networkInfo.subscriberCellularProvider
+        }
+
         if let isoCountryCode = carrier?.isoCountryCode {
             return isoCountryCode.uppercased()
         }
@@ -316,7 +322,7 @@ public final class PhoneNumberKit: NSObject {
     ///
     /// - returns: an optional Data representation of the metadata.
     public static func defaultMetadataCallback() throws -> Data? {
-        let frameworkBundle = Bundle(for: PhoneNumberKit.self)
+        let frameworkBundle = Bundle.module
         guard let jsonPath = frameworkBundle.path(forResource: "PhoneNumberMetadata", ofType: "json") else {
             throw PhoneNumberError.metadataNotFound
         }
